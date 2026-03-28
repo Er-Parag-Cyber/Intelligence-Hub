@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MORIS - Intelligence Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --red-primary: #dc2626;
+      --red-dark: #991b1b;
+      --red-glow: #ff4444;
+      --red-subtle: rgba(220, 38, 38, 0.1);
+      --black-dark: #0a0a0a;
+      --black-card: #141414;
+      --black-surface: #1a1a1a;
+      --white: #ffffff;
+      --gray-light: #a0a0a0;
+      --gray-dark: #404040;
+      --blue-accent: #3b82f6;
+      --green-accent: #22c55e;
+      --purple-accent: #a855f7;
+      --orange-accent: #f97316;
+    }
+
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .video-background video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 10, 0.7);
+    }
+
+    @media (max-width: 768px) {
+      .video-background video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .video-background video {
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        object-position: center center;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 500px) {
+      .video-background video {
+        width: auto;
+        height: 100%;
+      }
+    }
+
+    .bg-animated {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      background: var(--black-dark);
+    }
+
+    .bg-animated::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(ellipse at 20% 80%, rgba(220, 38, 38, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(153, 27, 27, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(220, 38, 38, 0.05) 0%, transparent 70%);
+      animation: pulseBg 8s ease-in-out infinite;
+    }
+
+    @keyframes pulseBg {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      animation: floatOrb 20s ease-in-out infinite;
+      opacity: 0.4;
+    }
+
+    .orb-1 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, var(--red-primary), var(--red-dark));
+      top: -100px;
+      left: -100px;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, var(--red-dark), #7f1d1d);
+      bottom: -50px;
+      right: -50px;
+      animation-delay: -5s;
+    }
+
+    .orb-3 {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(135deg, var(--red-glow), var(--red-primary));
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -10s;
+    }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(50px, -50px) scale(1.1); }
+      50% { transform: translate(-30px, 30px) scale(0.9); }
+      75% { transform: translate(-50px, -30px) scale(1.05); }
+    }
+
+    .grid-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(220, 38, 38, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(220, 38, 38, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridMove 30s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+      100% { transform: perspective(500px) rotateX(60deg) translateY(60px); }
+    }
+
+    .floating-elements {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .floating-diamond {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--red-primary);
+      transform: rotate(45deg);
+      opacity: 0.3;
+      animation: floatDiamond 15s ease-in-out infinite;
+    }
+
+    @keyframes floatDiamond {
+      0%, 100% { transform: rotate(45deg) translateY(0) scale(1); opacity: 0.3; }
+      50% { transform: rotate(45deg) translateY(-100px) scale(1.5); opacity: 0.6; }
+    }
+
+    .neon-ring {
+      position: absolute;
+      border: 2px solid var(--red-primary);
+      border-radius: 50%;
+      opacity: 0.1;
+      animation: ringPulse 10s ease-in-out infinite;
+    }
+
+    .neon-ring-1 {
+      width: 200px;
+      height: 200px;
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .neon-ring-2 {
+      width: 300px;
+      height: 300px;
+      bottom: 20%;
+      right: 10%;
+      animation-delay: -3s;
+    }
+
+    .neon-ring-3 {
+      width: 150px;
+      height: 150px;
+      top: 50%;
+      right: 20%;
+      animation-delay: -6s;
+    }
+
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1); opacity: 0.1; }
+      50% { transform: scale(1.2); opacity: 0.3; }
+    }
+
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--red-primary), transparent);
+      opacity: 0.3;
+      animation: scanMove 8s linear infinite;
+    }
+
+    @keyframes scanMove {
+      0% { top: -10%; }
+      100% { top: 110%; }
+    }
+
+    .noise-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.02;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .hexagon {
+      position: absolute;
+      width: 100px;
+      height: 115px;
+      background: transparent;
+      border: 1px solid rgba(220, 38, 38, 0.1);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      animation: hexFloat 20s ease-in-out infinite;
+    }
+
+    .hexagon-1 { top: 10%; left: 5%; animation-delay: 0s; }
+    .hexagon-2 { top: 60%; left: 85%; animation-delay: -5s; }
+    .hexagon-3 { top: 80%; left: 15%; animation-delay: -10s; }
+    .hexagon-4 { top: 20%; left: 75%; animation-delay: -15s; }
+
+    @keyframes hexFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.1; }
+      50% { transform: translateY(-30px) rotate(180deg); opacity: 0.3; }
+    }
+
+    .particles-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .particle-dot {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--red-glow);
+      border-radius: 50%;
+      animation: particleFloat 15s linear infinite;
+      box-shadow: 0 0 10px var(--red-primary), 0 0 20px var(--red-glow);
+    }
+
+    .shooting-star {
+      position: absolute;
+      width: 100px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--red-glow), transparent);
+      animation: shoot 8s linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes shoot {
+      0% { transform: translateX(-100px) translateY(0); opacity: 0; }
+      5% { opacity: 1; }
+      15% { transform: translateX(calc(100vw + 100px)) translateY(200px); opacity: 0; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes particleFloat {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--black-dark);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .bg-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bg-brand {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: clamp(150px, 25vw, 400px);
+      font-weight: 900;
+      color: var(--red-primary);
+      opacity: 0.03;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+      letter-spacing: 0.1em;
+      animation: brandPulse 8s ease-in-out infinite;
+      z-index: 1;
+    }
+
+    @keyframes brandPulse {
+      0%, 100% { opacity: 0.03; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 0.05; transform: translate(-50%, -50%) scale(1.02); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 600px;
+      animation: containerFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes containerFadeIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .card {
+      background: rgba(20, 20, 20, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(220, 38, 38, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      animation: cardSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+    }
+
+    @keyframes cardSlideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 35px;
+      animation: headerFade 0.6s ease-out 0.4s both;
+    }
+
+    @keyframes headerFade {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      animation: logoFloat 3s ease-in-out infinite;
+    }
+
+    .logo-img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      border-radius: 20px;
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(220, 38, 38, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .logo-img:hover {
+      transform: scale(1.05);
+      box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(220, 38, 38, 0.3);
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .brand-name {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--white), var(--red-glow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+
+    .tagline {
+      font-size: 14px;
+      color: var(--gray-light);
+      font-weight: 400;
+      letter-spacing: 0.05em;
+    }
+
+    .dropdown-container {
+      position: relative;
+      margin-bottom: 20px;
+      animation: searchFade 0.6s ease-out 0.5s both;
+    }
+
+    @keyframes searchFade {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dropdown-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-light);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .dropdown-select {
+      width: 100%;
+      padding: 16px 20px;
+      background: rgba(10, 10, 10, 0.6);
+      backdrop-filter: blur(5px);
+      border: 2px solid rgba(220, 38, 38, 0.2);
+      border-radius: 16px;
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      appearance: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+    }
+
+    .dropdown-select:hover {
+      border-color: rgba(220, 38, 38, 0.4);
+      background: rgba(10, 10, 10, 0.7);
+    }
+
+    .dropdown-select:focus {
+      border-color: var(--red-primary);
+      box-shadow: 
+        0 0 0 4px rgba(220, 38, 38, 0.1),
+        0 0 20px rgba(220, 38, 38, 0.15);
+    }
+
+    .dropdown-wrapper {
+      position: relative;
+    }
+
+    .dropdown-arrow {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-light);
+      pointer-events: none;
+      transition: transform 0.3s ease;
+    }
+
+    .dropdown-select:focus + .dropdown-arrow {
+      transform: translateY(-50%) rotate(180deg);
+      color: var(--red-primary);
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-light);
+      transition: color 0.3s ease;
+      z-index: 2;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .input-icon i {
+      font-size: 18px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 18px 50px 18px 52px;
+      background: rgba(10, 10, 10, 0.6);
+      backdrop-filter: blur(5px);
+      border: 2px solid rgba(220, 38, 38, 0.2);
+      border-radius: 16px;
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 500;
+      font-family: inherit;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: rgba(160, 160, 160, 0.6);
+      font-weight: 400;
+    }
+
+    .search-input:hover {
+      border-color: rgba(220, 38, 38, 0.3);
+    }
+
+    .search-input:focus {
+      border-color: var(--red-primary);
+      background: rgba(220, 38, 38, 0.05);
+      box-shadow: 
+        0 0 0 4px rgba(220, 38, 38, 0.1),
+        0 0 20px rgba(220, 38, 38, 0.15);
+    }
+
+    .search-input:focus ~ .input-icon {
+      color: var(--red-primary);
+    }
+
+    .input-glow {
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--red-primary), var(--red-glow));
+      opacity: 0;
+      filter: blur(8px);
+      z-index: -1;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .search-input:focus ~ .input-glow {
+      opacity: 1;
+    }
+
+    .btn-lookup {
+      width: 100%;
+      padding: 18px 32px;
+      background: linear-gradient(135deg, var(--red-primary), var(--red-dark));
+      border: none;
+      border-radius: 16px;
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: btnFade 0.6s ease-out 0.6s both;
+      box-shadow: 
+        0 4px 15px rgba(220, 38, 38, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      margin-top: 20px;
+    }
+
+    @keyframes btnFade {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn-lookup::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-lookup:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 
+        0 8px 25px rgba(220, 38, 38, 0.4),
+        0 0 40px rgba(220, 38, 38, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    }
+
+    .btn-lookup:hover::before {
+      left: 100%;
+    }
+
+    .btn-lookup:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .btn-lookup:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-icon {
+      transition: transform 0.3s ease;
+    }
+
+    .btn-lookup:hover .btn-icon {
+      transform: translateX(4px);
+    }
+
+    .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .btn-lookup.loading .spinner {
+      display: block;
+    }
+
+    .btn-lookup.loading .btn-text {
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .result-container {
+      margin-top: 25px;
+      animation: resultFade 0.6s ease-out 0.7s both;
+    }
+
+    @keyframes resultFade {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-placeholder {
+      background: rgba(220, 38, 38, 0.05);
+      border: 1px dashed rgba(220, 38, 38, 0.2);
+      border-radius: 16px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .placeholder-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      color: var(--red-primary);
+      opacity: 0.5;
+    }
+
+    .placeholder-text {
+      color: var(--gray-light);
+      font-size: 14px;
+    }
+
+    .result-card {
+      display: none;
+      background: rgba(10, 10, 10, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: resultSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .result-card.show {
+      display: block;
+    }
+
+    @keyframes resultSlideIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .result-header {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(220, 38, 38, 0.08));
+      backdrop-filter: blur(5px);
+      padding: 20px;
+      border-bottom: 1px solid rgba(220, 38, 38, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .result-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--red-primary), var(--red-dark));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .result-icon i {
+      font-size: 18px;
+      color: white;
+    }
+
+    .result-title {
+      flex: 1;
+    }
+
+    .result-title h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .result-query {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--red-glow);
+      font-family: monospace;
+    }
+
+    .result-body {
+      padding: 20px;
+      background: rgba(15, 15, 15, 0.5);
+    }
+
+    .data-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .data-item:last-child {
+      border-bottom: none;
+    }
+
+    .data-item:hover {
+      background: rgba(220, 38, 38, 0.03);
+      margin: 0 -20px;
+      padding-left: 20px;
+      padding-right: 50px;
+    }
+
+    .data-label {
+      flex: 0 0 120px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-light);
+      padding-top: 2px;
+    }
+
+    .data-value {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--white);
+      word-break: break-word;
+    }
+
+    .data-value.code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      background: var(--black-surface);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    .copy-btn {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--black-surface);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--gray-light);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      opacity: 0;
+    }
+
+    .data-item:hover .copy-btn {
+      opacity: 1;
+    }
+
+    .copy-btn:hover {
+      background: var(--red-primary);
+      border-color: var(--red-primary);
+      color: white;
+    }
+
+    .copy-btn.copied {
+      background: var(--green-accent);
+      border-color: var(--green-accent);
+      color: white;
+    }
+
+    .moris-info-box {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(220, 38, 38, 0.05));
+      border: 1px solid rgba(220, 38, 38, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .moris-info-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--red-primary);
+      margin-bottom: 12px;
+    }
+
+    .moris-info-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 0;
+    }
+
+    .moris-info-item:not(:last-child) {
+      border-bottom: 1px solid rgba(220, 38, 38, 0.1);
+    }
+
+    .moris-info-label {
+      font-size: 12px;
+      color: var(--gray-light);
+      font-weight: 500;
+    }
+
+    .moris-info-value {
+      font-size: 14px;
+      color: var(--white);
+      font-weight: 700;
+      background: rgba(220, 38, 38, 0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .json-view {
+      background: var(--black-surface);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 10px;
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .json-view pre {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--gray-light);
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .json-key { color: var(--red-glow); }
+    .json-string { color: #4ade80; }
+    .json-number { color: #60a5fa; }
+    .json-boolean { color: #f472b6; }
+
+    .error-card {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .error-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      color: #ef4444;
+    }
+
+    .error-message {
+      color: #fca5a5;
+      font-size: 14px;
+    }
+
+    .loading-card {
+      background: var(--black-dark);
+      border: 1px solid rgba(220, 38, 38, 0.15);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(220, 38, 38, 0.2);
+      border-top-color: var(--red-primary);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loading-text {
+      color: var(--gray-light);
+      font-size: 14px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    .history-section {
+      margin-top: 30px;
+      animation: historyFade 0.6s ease-out 0.8s both;
+    }
+
+    @keyframes historyFade {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: 12px 16px;
+      background: rgba(26, 26, 26, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(220, 38, 38, 0.15);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      margin-bottom: 10px;
+    }
+
+    .history-header:hover {
+      background: rgba(220, 38, 38, 0.15);
+      border-color: rgba(220, 38, 38, 0.25);
+    }
+
+    .history-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-light);
+    }
+
+    .history-title i {
+      color: var(--red-primary);
+    }
+
+    .history-toggle {
+      transition: transform 0.3s ease;
+    }
+
+    .history-toggle.collapsed {
+      transform: rotate(-90deg);
+    }
+
+    .history-list {
+      max-height: 300px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--red-primary) rgba(26, 26, 26, 0.6);
+    }
+
+    .history-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .history-list::-webkit-scrollbar-track {
+      background: rgba(26, 26, 26, 0.4);
+      border-radius: 3px;
+    }
+
+    .history-list::-webkit-scrollbar-thumb {
+      background: var(--red-primary);
+      border-radius: 3px;
+    }
+
+    .history-list.collapsed {
+      display: none;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(10, 10, 10, 0.5);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .history-item:hover {
+      background: rgba(220, 38, 38, 0.15);
+      border-color: rgba(220, 38, 38, 0.25);
+      transform: translateX(5px);
+    }
+
+    .history-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 14px;
+    }
+
+    .history-icon.phone { background: rgba(220, 38, 38, 0.2); color: var(--red-primary); }
+    .history-icon.telegram { background: rgba(59, 130, 246, 0.2); color: var(--blue-accent); }
+    .history-icon.username { background: rgba(168, 85, 247, 0.2); color: var(--purple-accent); }
+    .history-icon.aadhar { background: rgba(249, 115, 22, 0.2); color: var(--orange-accent); }
+
+    .history-info {
+      flex: 1;
+    }
+
+    .history-type {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-light);
+    }
+
+    .history-query {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--white);
+    }
+
+    .history-delete {
+      background: none;
+      border: none;
+      color: var(--gray-dark);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .history-delete:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .history-empty {
+      text-align: center;
+      padding: 30px;
+      color: var(--gray-dark);
+      font-size: 14px;
+    }
+
+    .clear-history {
+      background: none;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clear-history:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: var(--gray-dark);
+      font-size: 12px;
+      animation: footerFade 0.6s ease-out 0.8s both;
+    }
+
+    @keyframes footerFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .footer a {
+      color: var(--red-primary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer a:hover {
+      color: var(--red-glow);
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 20px 15px;
+      }
+
+      .card {
+        padding: 25px;
+        border-radius: 20px;
+      }
+
+      .brand-name {
+        font-size: 26px;
+      }
+
+      .data-item {
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .data-label {
+        flex: none;
+      }
+
+      .copy-btn {
+        opacity: 1;
+        position: relative;
+        right: auto;
+        top: auto;
+        transform: none;
+        margin-top: 8px;
+      }
+    }
+
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .type-badge.phone { background: rgba(220, 38, 38, 0.2); color: var(--red-primary); }
+    .type-badge.telegram { background: rgba(59, 130, 246, 0.2); color: var(--blue-accent); }
+    .type-badge.username { background: rgba(168, 85, 247, 0.2); color: var(--purple-accent); }
+    .type-badge.aadhar { background: rgba(249, 115, 22, 0.2); color: var(--orange-accent); }
+  </style>
+</head>
+<body>
+  <div class="video-background">
+    <video autoplay muted loop playsinline>
+      <source src="bg.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+  </div>
+  <div class="bg-brand">MORIS</div>
+
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="logo-wrapper">
+          <img src="WhatsApp%20Image%202026-03-03%20at%2012.14.37%20AM.jpeg" alt="MORIS Logo" class="logo-img">
+        </div>
+        <h1 class="brand-name">MORIS</h1>
+        <p class="tagline">Intelligence Hub</p>
+      </div>
+
+      <div class="dropdown-container">
+        <label class="dropdown-label">Select Lookup Type</label>
+        <div class="dropdown-wrapper">
+          <select id="lookupType" class="dropdown-select" onchange="handleTypeChange()">
+            <option value="phone" data-icon="fa-phone">📱 Phone Number Lookup</option>
+            <option value="aadhar" data-icon="fa-id-card">🪪 Aadhar to Family</option>
+          </select>
+          <span class="dropdown-arrow">
+            <i class="fas fa-chevron-down"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <div class="input-wrapper">
+          <div class="input-icon" id="inputIcon">
+            <i class="fas fa-phone"></i>
+          </div>
+          <input 
+            type="text" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Enter phone number..."
+            autocomplete="off"
+          >
+          <div class="input-glow"></div>
+        </div>
+      </div>
+
+      <button id="lookupBtn" class="btn-lookup" onclick="performLookup()">
+        <span class="btn-content">
+          <span class="btn-text">Search</span>
+          <i class="fas fa-search btn-icon"></i>
+          <div class="spinner"></div>
+        </span>
+      </button>
+
+      <div class="result-container" id="resultContainer">
+        <div class="result-placeholder" id="placeholder">
+          <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <p class="placeholder-text">Select a lookup type and enter a value to search</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="history-section">
+      <div class="history-header" onclick="toggleHistory()">
+        <div class="history-title">
+          <i class="fas fa-history"></i>
+          <span>Recent Lookups</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button class="clear-history" onclick="clearHistory(event)">Clear All</button>
+          <i class="fas fa-chevron-down history-toggle" id="historyToggle"></i>
+        </div>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty" id="historyEmpty">
+          <i class="fas fa-inbox" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
+          <p>No recent lookups yet</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Powered by <a href="#">MORIS</a> Intelligence Platform
+    </div>
+  </div>
+
+  <script>
+    const lookupType = document.getElementById('lookupType');
+    const searchInput = document.getElementById('searchInput');
+    const lookupBtn = document.getElementById('lookupBtn');
+    const resultContainer = document.getElementById('resultContainer');
+    const inputIcon = document.getElementById('inputIcon');
+
+    const typeConfig = {
+      'phone': {
+        placeholder: 'Enter phone number (e.g., 91XXXXXXXXXX)...',
+        icon: 'fa-phone',
+        apiEndpoint: '/api/lookup',
+        paramName: 'num',
+        label: 'Phone'
+      },
+      'aadhar': {
+        placeholder: 'Enter 12-digit Aadhar number (e.g., 123456789012)...',
+        icon: 'fa-id-card',
+        apiEndpoint: '/api/aadhar-family',
+        paramName: 'aadhar',
+        label: 'Aadhar'
+      }
+    };
+
+    function handleTypeChange() {
+      const selectedType = lookupType.value;
+      const config = typeConfig[selectedType];
+      
+      searchInput.placeholder = config.placeholder;
+      inputIcon.innerHTML = `<i class="fas ${config.icon}"></i>`;
+      searchInput.value = '';
+      searchInput.focus();
+      
+      searchInput.style.animation = 'none';
+      searchInput.offsetHeight;
+      searchInput.style.animation = 'pulse 0.3s ease';
+    }
+
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        performLookup();
+      }
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      const selectedType = lookupType.value;
+      
+      if (selectedType === 'aadhar') {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
+      } else if (selectedType === 'phone' || selectedType === 'telegram-id') {
+        e.target.value = e.target.value.replace(/[^\d+\-]/g, '');
+      }
+    });
+
+    async function performLookup() {
+      const query = searchInput.value.trim();
+      const type = lookupType.value;
+
+      if (!query) {
+        showError('Please enter a value to search');
+        searchInput.focus();
+        return;
+      }
+
+      if (type === 'aadhar' && query.length !== 12) {
+        showError('Aadhar number must be exactly 12 digits');
+        searchInput.focus();
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const config = typeConfig[type];
+        const response = await fetch(`${config.apiEndpoint}?${config.paramName}=${encodeURIComponent(query)}`);
+        const data = await response.json();
+
+        if (data.success) {
+          showResult(data);
+          addToHistory(type, query, data);
+        } else {
+          showError(data.error || 'Failed to fetch data');
+        }
+      } catch (error) {
+        showError('Network error. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function setLoading(loading) {
+      lookupBtn.disabled = loading;
+      lookupBtn.classList.toggle('loading', loading);
+    }
+
+    function showError(message) {
+      resultContainer.innerHTML = `
+        <div class="error-card">
+          <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+          <p class="error-message">${message}</p>
+        </div>
+      `;
+    }
+
+    function showLoading() {
+      resultContainer.innerHTML = `
+        <div class="loading-card">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Searching...</p>
+        </div>
+      `;
+    }
+
+    function showResult(data) {
+      const resultData = data.data;
+      const type = data.type;
+      let dataItemsHtml = '';
+
+      const filterKeys = ['credit', 'owner', 'admin', 'help', 'group', 'telegram', 'giveway', 'note', 'shuubhh', 'ayano', 'anurag', 'your usage', 'usage', 'remaining'];
+      const typeIcons = {
+        'phone': 'fa-phone',
+        'aadhar-family': 'fa-id-card'
+      };
+
+      if (typeof resultData === 'object' && resultData !== null) {
+        Object.entries(resultData).forEach(([key, value], index) => {
+          const lowerKey = key.toLowerCase();
+          if (filterKeys.some(fk => lowerKey.includes(fk))) return;
+          
+          const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          const displayValue = typeof value === 'object' 
+            ? `<pre>${syntaxHighlight(JSON.stringify(value, null, 2))}</pre>`
+            : String(value);
+          
+          dataItemsHtml += `
+            <div class="data-item" style="animation-delay: ${index * 0.05}s">
+              <span class="data-label">${displayKey}</span>
+              <span class="data-value ${typeof value === 'object' ? 'code' : ''}" data-value="${escapeHtml(String(value))}">${displayValue}</span>
+              <button class="copy-btn" onclick="copyToClipboard(this, '${escapeHtml(String(value))}')">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          `;
+        });
+      } else {
+        dataItemsHtml = `
+          <div class="data-item">
+            <span class="data-label">Result</span>
+            <span class="data-value code" data-value="${escapeHtml(String(resultData))}">${syntaxHighlight(String(resultData))}</span>
+            <button class="copy-btn" onclick="copyToClipboard(this, '${escapeHtml(String(resultData))}')">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        `;
+      }
+
+      const typeBadgeClass = type.replace('-', '');
+      const typeLabel = typeConfig[type]?.label || type;
+
+      const credit = data.data?.credit || data.data?.developer;
+      const developer = data.data?.developer || data.data?.credit;
+      
+      const morisInfoHtml = (credit || developer) ? `
+        <div class="moris-info-box">
+          <div class="moris-info-title">Powered by MORIS</div>
+          ${credit ? `
+          <div class="moris-info-item">
+            <span class="moris-info-label">Credit:</span>
+            <span class="moris-info-value">${escapeHtml(credit)}</span>
+          </div>
+          ` : ''}
+          ${developer ? `
+          <div class="moris-info-item">
+            <span class="moris-info-label">Developer:</span>
+            <span class="moris-info-value">MR MORIS🪬</span>
+          </div>
+          ` : ''}
+        </div>
+      ` : '';
+
+      resultContainer.innerHTML = `
+        <div class="result-card show">
+          <div class="result-header">
+            <div class="result-icon">
+              <i class="fas ${typeIcons[type] || 'fa-search'}"></i>
+            </div>
+            <div class="result-title">
+              <h3><span class="type-badge ${typeBadgeClass}">${typeLabel}</span></h3>
+              <span class="result-query">${escapeHtml(data.query)}</span>
+            </div>
+          </div>
+          <div class="result-body">
+            ${dataItemsHtml || '<p style="color: var(--gray-light); text-align: center; padding: 20px;">No data available</p>'}
+            ${morisInfoHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML.replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
+
+    function copyToClipboard(btn, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add('copied');
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = '<i class="fas fa-copy"></i>';
+        }, 2000);
+      });
+    }
+
+    function syntaxHighlight(json) {
+      if (typeof json !== 'string') {
+        json = JSON.stringify(json, null, 2);
+      }
+      json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        let cls = 'json-number';
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) {
+            cls = 'json-key';
+            match = match.replace(/:$/, '');
+            return `<span class="${cls}">${match}</span>:`;
+          } else {
+            cls = 'json-string';
+          }
+        } else if (/true|false/.test(match)) {
+          cls = 'json-boolean';
+        }
+        return `<span class="${cls}">${match}</span>`;
+      });
+    }
+
+    function getHistory() {
+      const history = localStorage.getItem('moris_history');
+      return history ? JSON.parse(history) : [];
+    }
+
+    function saveHistory(history) {
+      localStorage.setItem('moris_history', JSON.stringify(history));
+    }
+
+    function addToHistory(type, query, data) {
+      let history = getHistory();
+      
+      const existingIndex = history.findIndex(h => h.type === type && h.query === query);
+      if (existingIndex !== -1) {
+        history.splice(existingIndex, 1);
+      }
+      
+      history.unshift({
+        type,
+        query,
+        timestamp: new Date().toISOString()
+      });
+      
+      history = history.slice(0, 20);
+      saveHistory(history);
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = getHistory();
+      const historyList = document.getElementById('historyList');
+      const historyEmpty = document.getElementById('historyEmpty');
+
+      if (history.length === 0) {
+        historyEmpty.style.display = 'block';
+        historyList.innerHTML = historyEmpty.outerHTML;
+        return;
+      }
+
+      const typeIcons = {
+        'phone': 'fa-phone',
+        'aadhar-family': 'fa-id-card',
+        'aadhar': 'fa-id-card'
+      };
+
+      let html = '';
+      history.forEach((item, index) => {
+        const typeLabel = typeConfig[item.type]?.label || item.type;
+        const iconClass = typeIcons[item.type] || 'fa-search';
+        
+        html += `
+          <div class="history-item" onclick="loadFromHistory('${item.type}', '${escapeHtml(item.query)}')">
+            <div class="history-icon ${item.type.replace('-', '')}">
+              <i class="fas ${iconClass}"></i>
+            </div>
+            <div class="history-info">
+              <div class="history-type">${typeLabel}</div>
+              <div class="history-query">${escapeHtml(item.query)}</div>
+            </div>
+            <button class="history-delete" onclick="deleteHistoryItem(event, ${index})">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        `;
+      });
+
+      historyList.innerHTML = html;
+    }
+
+    function loadFromHistory(type, query) {
+      lookupType.value = type;
+      handleTypeChange();
+      searchInput.value = query;
+      performLookup();
+    }
+
+    function deleteHistoryItem(event, index) {
+      event.stopPropagation();
+      let history = getHistory();
+      history.splice(index, 1);
+      saveHistory(history);
+      renderHistory();
+    }
+
+    function toggleHistory() {
+      const historyList = document.getElementById('historyList');
+      const historyToggle = document.getElementById('historyToggle');
+      
+      historyList.classList.toggle('collapsed');
+      historyToggle.classList.toggle('collapsed');
+    }
+
+    function clearHistory(event) {
+      event.stopPropagation();
+      localStorage.removeItem('moris_history');
+      renderHistory();
+    }
+
+    renderHistory();
+  </script>
+</body>
+</html>
